@@ -173,7 +173,7 @@ public class GifDecoder {
      * @return Bitmap representation of frame
      */
     public Bitmap getNextFrame() {
-        if (frameCount <= 0 || framePointer < 0 || currentImage == null) {
+        if (frameCount <= 0 || framePointer < 0) {
             return null;
         }
 
@@ -288,31 +288,31 @@ public class GifDecoder {
         // final location of blended pixels
         final int[] dest = mainScratch;
 
-        // fill in starting image contents based on last image's dispose code
-        if (previousFrame != null && previousFrame.dispose > DISPOSAL_UNSPECIFIED) {
-            if (previousFrame.dispose == DISPOSAL_NONE && currentImage != null) {
-                // Start with the current image
-                currentImage.getPixels(dest, 0, width, 0, 0, width, height);
-            }
-            if (previousFrame.dispose == DISPOSAL_BACKGROUND) {
-                // Start with a canvas filled with the background color
-                int c = 0;
-                if (!currentFrame.transparency) {
-                    c = bgColor;
-                }
-                for (int i = 0; i < previousFrame.ih; i++) {
-                    int n1 = (previousFrame.iy + i) * width + previousFrame.ix;
-                    int n2 = n1 + previousFrame.iw;
-                    for (int k = n1; k < n2; k++) {
-                        dest[k] = c;
-                    }
-                }
-            }
-            if (previousFrame.dispose == DISPOSAL_PREVIOUS && previousImage != null) {
-                // Start with the previous frame
-                previousImage.getPixels(dest, 0, width, 0, 0, width, height);
-            }
-        }
+//        // fill in starting image contents based on last image's dispose code
+//        if (previousFrame != null && previousFrame.dispose > DISPOSAL_UNSPECIFIED) {
+//            if (previousFrame.dispose == DISPOSAL_NONE && currentImage != null) {
+//                // Start with the current image
+//                currentImage.getPixels(dest, 0, width, 0, 0, width, height);
+//            }
+//            if (previousFrame.dispose == DISPOSAL_BACKGROUND) {
+//                // Start with a canvas filled with the background color
+//                int c = 0;
+//                if (!currentFrame.transparency) {
+//                    c = bgColor;
+//                }
+//                for (int i = 0; i < previousFrame.ih; i++) {
+//                    int n1 = (previousFrame.iy + i) * width + previousFrame.ix;
+//                    int n2 = n1 + previousFrame.iw;
+//                    for (int k = n1; k < n2; k++) {
+//                        dest[k] = c;
+//                    }
+//                }
+//            }
+//            if (previousFrame.dispose == DISPOSAL_PREVIOUS && previousImage != null) {
+//                // Start with the previous frame
+//                previousImage.getPixels(dest, 0, width, 0, 0, width, height);
+//            }
+//        }
 
         //Decode pixels for this frame  into the global pixels[] scratch
         decodeBitmapData(currentFrame, mainPixels); // decode pixel data
@@ -367,10 +367,12 @@ public class GifDecoder {
         }
 
         //Copy pixels into previous image
-        currentImage.getPixels(copyScratch, 0, width, 0, 0, width, height);
-        previousImage.setPixels(copyScratch, 0, width, 0, 0, width, height);
+        //currentImage.getPixels(copyScratch, 0, width, 0, 0, width, height);
+        //previousImage.setPixels(copyScratch, 0, width, 0, 0, width, height);
         //Set pixels for current image
-        currentImage.setPixels(dest, 0, width, 0, 0, width, height);
+
+        currentImage = Bitmap.createBitmap(dest, width, height, Bitmap.Config.ARGB_8888);
+        //currentImage.setPixels(dest, 0, width, 0, 0, width, height);
     }
 
     /**
@@ -718,10 +720,10 @@ public class GifDecoder {
         //Now that we know the size, init scratch arrays
         mainPixels = new byte[width * height];
         mainScratch = new int[width * height];
-        copyScratch = new int[width * height];
+        //copyScratch = new int[width * height];
 
-        previousImage = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
-        currentImage = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        //previousImage = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+        //currentImage = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
     }
 
     /**

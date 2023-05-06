@@ -34,7 +34,7 @@ public class GifEncoder {
 
   protected int width; // image size
   protected int height;
-  protected Color transparent = null; // transparent color if given
+  protected int transparent = -1; // transparent color if given
   protected int transIndex; // transparent index in color table
   protected int repeat = -1; // no repeat
   protected int delay = 0; // frame delay (hundredths)
@@ -101,7 +101,7 @@ public class GifEncoder {
    *
    * @param c Color to be treated as transparent on display.
    */
-  public void setTransparent(Color c) {
+  public void setTransparent(int c) {
     transparent = c;
   }
 
@@ -315,7 +315,7 @@ public class GifEncoder {
     colorDepth = 8;
     palSize = 7;
     // get closest match to transparent color if specified
-    if (transparent != null) {
+    if (transparent != -1) {
       transIndex = findClosest(transparent);
     }
   }
@@ -324,11 +324,11 @@ public class GifEncoder {
    * Returns index of palette color closest to c
    *
    */
-  protected int findClosest(Color c) {
+  protected int findClosest(int c) {
     if (colorTab == null) return -1;
-    int r = 0;
-    int g = 0;
-    int b = 0;
+    int r = (c >> 16) & 0xff;
+    int g = (c >> 8) & 0xff;
+    int b = (c >> 0) & 0xff;
     int minpos = 0;
     int dmin = 256 * 256 * 256;
     int len = colorTab.length;
@@ -389,7 +389,7 @@ public class GifEncoder {
     out.write(0xf9); // GCE label
     out.write(4); // data block size
     int transp, disp;
-    if (transparent == null) {
+    if (transparent == -1) {
       transp = 0;
       disp = 0; // dispose = no action
     } else {
